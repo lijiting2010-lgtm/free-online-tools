@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>免费在线图片压缩 - 批量压缩PNG/JPG/WebP</title>
+<meta name="description" content="免费在线图片压缩工具，支持PNG、JPG、WebP格式压缩。浏览器端处理，不上传服务器，保护隐私。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+body{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);min-height:100vh;padding:20px;display:flex;align-items:center;justify-content:center}
+.container{max-width:700px;width:100%;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.15);overflow:hidden}
+.header{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);padding:25px;text-align:center;color:#fff}
+.header h1{font-size:24px;margin-bottom:5px}
+.upload-area{margin:20px;padding:40px;border:2px dashed #ddd;border-radius:12px;text-align:center;cursor:pointer;transition:all .3s}
+.upload-area:hover{border-color:#f5576c;background:#fff5f5}
+.upload-area .icon{font-size:48px;margin-bottom:10px}
+.upload-area p{color:#999;font-size:14px}
+.result-area{padding:0 20px 20px}
+.result-item{background:#f9f9f9;border-radius:10px;padding:15px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.result-item .info{flex:1}
+.result-item .name{font-size:14px;font-weight:600;color:#333;margin-bottom:4px}
+.result-item .size{font-size:12px;color:#999}
+.result-item .savings{color:#f5576c;font-weight:600;font-size:13px}
+.quality-row{display:flex;align-items:center;justify-content:center;gap:15px;padding:10px 20px}
+.quality-row label{font-size:13px;color:#666}
+.quality-row input[type="range"]{width:200px}
+.footer{text-align:center;padding:12px;color:#999;font-size:12px;border-top:1px solid #f0f0f0}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><h1>🖼️ 图片压缩</h1><p>浏览器端处理 · 不上传服务器 · 保护隐私</p></div>
+<div class="quality-row">
+<label>压缩质量: <span id="qualityVal">80</span>%</label>
+<input type="range" id="quality" min="10" max="100" value="80" oninput="document.getElementById('qualityVal').textContent=this.value">
+</div>
+<div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+<div class="icon">📁</div>
+<p>点击上传图片 / 拖拽图片到此处</p>
+<p style="font-size:12px;color:#ccc;margin-top:5px">支持 PNG、JPG、WebP · 最大20MB</p>
+</div>
+<input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)">
+<div class="result-area" id="resultArea"></div>
+<div class="footer">💡 所有处理在本地完成，图片不会上传到服务器</div>
+</div>
+<script>
+const qualityInput=document.getElementById('quality');
+const fileInput=document.getElementById('fileInput');
+const resultArea=document.getElementById('resultArea');
+const uploadArea=document.getElementById('uploadArea');
+
+uploadArea.addEventListener('dragover',e=>{e.preventDefault();uploadArea.style.borderColor='#f5576c';uploadArea.style.background='#fff5f5';});
+uploadArea.addEventListener('dragleave',()=>{uploadArea.style.borderColor='#ddd';uploadArea.style.background='';});
+uploadArea.addEventListener('drop',e=>{e.preventDefault();uploadArea.style.borderColor='#ddd';uploadArea.style.background='';if(e.dataTransfer.files.length)handleFiles(e.dataTransfer.files);});
+
+function handleFiles(files){
+resultArea.innerHTML='';
+for(const file of files){
+if(!file.type.startsWith('image/'))continue;
+const item=document.createElement('div');
+item.className='result-item';
+const origSize=file.size;
+item.innerHTML='<div class="info"><div class="name">'+file.name+'</div><div class="size">原大小: '+formatSize(origSize)+'</div></div><div class="savings" id="savings-'+file.name.replace(/[^a-zA-Z0-9]/g,'')+'">处理中...</div>';
+resultArea.appendChild(item);
+compressImage(file);
+}
+}
+
+function compressImage(file){
+const reader=new FileReader();
+reader.onload=function(e){
+const img=new Image();
+img.onload=function(){
+const canvas=document.createElement('canvas');
+canvas.width=img.width;
+canvas.height=img.height;
+const ctx=canvas.getContext('2d');
+ctx.drawImage(img,0,0);
+const quality=qualityInput.value/100;
+canvas.toBlob(function(blob){
+const savingsId='savings-'+file.name.replace(/[^a-zA-Z0-9]/g,'');
+const el=document.getElementById(savingsId);
+if(el){
+const ratio=((1-blob.size/file.size)*100).toFixed(1);
+el.textContent='-'+ratio+'% ('+formatSize(blob.size)+')';
+el.style.color=ratio>20?'#f5576c':'#666';
+}
+},file.type,quality);
+};
+img.src=e.target.result;
+};
+reader.readAsDataURL(file);
+}
+
+function formatSize(bytes){
+if(bytes<1024)return bytes+'B';
+if(bytes<1048576)return(bytes/1024).toFixed(1)+'KB';
+return(bytes/1048576).toFixed(1)+'MB';
+}
+</script>
+</body>
+</html>

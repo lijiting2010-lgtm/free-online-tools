@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>免费在线翻译 - 多语言翻译工具</title>
+<meta name="description" content="免费在线翻译工具，支持中英日韩法德等多语言互译。无需注册，即开即用。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+body{background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%);min-height:100vh;padding:20px;display:flex;align-items:center;justify-content:center}
+.container{max-width:800px;width:100%;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.15);overflow:hidden}
+.header{background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%);padding:25px;text-align:center;color:#fff}
+.header h1{font-size:24px;margin-bottom:5px}
+select{padding:8px 15px;border:2px solid #e0e0e0;border-radius:10px;font-size:14px;outline:none;margin:0 5px;cursor:pointer}
+select:focus{border-color:#43e97b}
+.editor{padding:20px}
+.editor textarea{width:100%;height:150px;padding:15px;border:2px solid #e0e0e0;border-radius:12px;font-size:14px;resize:vertical;outline:none;line-height:1.6}
+.editor textarea:focus{border-color:#43e97b}
+.lang-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+.swap-btn{width:40px;height:40px;border-radius:50%;border:2px solid #e0e0e0;background:#fff;cursor:pointer;font-size:18px;transition:all .3s}
+.swap-btn:hover{background:#43e97b;color:#fff;border-color:#43e97b}
+.translate-btn{display:block;width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%);color:#fff;font-size:16px;font-weight:600;cursor:pointer;margin-top:15px;transition:transform .2s}
+.translate-btn:hover{transform:translateY(-2px)}
+.result-box{margin-top:15px;padding:15px;background:#f5f7fb;border-radius:12px;min-height:60px;font-size:14px;line-height:1.6;color:#666}
+.footer{text-align:center;padding:12px;color:#999;font-size:12px;border-top:1px solid #f0f0f0}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><h1>🌐 在线翻译</h1><p>免费多语言翻译 · 无需注册</p></div>
+<div class="editor">
+<div class="lang-row">
+<select id="fromLang">
+<option value="auto">自动检测</option>
+<option value="zh" selected>中文</option>
+<option value="en">英语</option>
+<option value="ja">日语</option>
+<option value="ko">韩语</option>
+<option value="fr">法语</option>
+<option value="de">德语</option>
+<option value="es">西班牙语</option>
+</select>
+<button class="swap-btn" onclick="swapLang()">⇄</button>
+<select id="toLang">
+<option value="en">英语</option>
+<option value="zh" selected>中文</option>
+<option value="ja">日语</option>
+<option value="ko">韩语</option>
+<option value="fr">法语</option>
+<option value="de">德语</option>
+<option value="es">西班牙语</option>
+</select>
+</div>
+<textarea id="sourceText" placeholder="请输入要翻译的文本..."></textarea>
+<button class="translate-btn" onclick="translateText()">🔄 翻译</button>
+<div class="result-box" id="resultBox">翻译结果将显示在这里</div>
+</div>
+<div class="footer">💡 提示：此翻译为模拟功能，展示翻译工具界面。实际使用建议集成API。</div>
+</div>
+<script>
+const sampleTranslations={
+"zh-en":{"你好":"Hello","谢谢":"Thank you","今天天气真好":"The weather is nice today","我爱你":"I love you","多少钱":"How much","再见":"Goodbye","早上好":"Good morning"},
+"en-zh":{"Hello":"你好","Thank you":"谢谢","Good morning":"早上好","Goodbye":"再见","How are you":"你好吗","I love you":"我爱你"},
+"zh-ja":{"你好":"こんにちは","谢谢":"ありがとう","再见":"さようなら","早上好":"おはようございます"},
+"zh-ko":{"你好":"안녕하세요","谢谢":"감사합니다","再见":"안녕히 계세요","多少钱":"얼마예요"}
+};
+function swapLang(){
+const fl=document.getElementById('fromLang');
+const tl=document.getElementById('toLang');
+const tmp=fl.value;fl.value=tl.value;tl.value=tmp;
+}
+function translateText(){
+const src=document.getElementById('sourceText').value.trim();
+if(!src){document.getElementById('resultBox').innerHTML='⚠️ 请先输入要翻译的文本';return;}
+const fl=document.getElementById('fromLang').value;
+const tl=document.getElementById('toLang').value;
+const key=fl+'-'+tl;
+document.getElementById('resultBox').innerHTML='🔄 翻译中...';
+setTimeout(()=>{
+const dict=sampleTranslations[key]||sampleTranslations[Object.keys(sampleTranslations).find(k=>k.includes(tl)&&k.includes(fl))];
+let result;
+if(dict&&dict[src]){result=dict[src];}
+else{result='[翻译] '+src+'\n\n💡 检测语言: '+(fl==='auto'?'自动检测':fl)+' → '+tl+'\n\n这是演示版本，如需准确翻译请集成翻译API。';}
+document.getElementById('resultBox').innerHTML=result.replace(/\n/g,'<br>');
+},600);
+}
+</script>
+</body>
+</html>

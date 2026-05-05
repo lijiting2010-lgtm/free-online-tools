@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>免费AI在线聊天 - AI对话助手</title>
+<meta name="description" content="免费在线AI聊天工具，无需注册，直接对话。支持多种AI模型，智能问答、文案写作、代码编程、翻译等。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+body{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px}
+.container{max-width:800px;margin:0 auto;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+.header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:30px;text-align:center;color:#fff}
+.header h1{font-size:28px;margin-bottom:8px}
+.header p{opacity:.9;font-size:14px}
+.chat-area{height:400px;overflow-y:auto;padding:20px;background:#f5f7fb}
+.msg{margin-bottom:15px;display:flex}
+.msg.user{justify-content:flex-end}
+.msg .bubble{max-width:75%;padding:12px 16px;border-radius:15px;font-size:14px;line-height:1.5}
+.msg.user .bubble{background:#667eea;color:#fff;border-bottom-right-radius:5px}
+.msg.bot .bubble{background:#e8ecf1;color:#333;border-bottom-left-radius:5px}
+.input-area{display:flex;padding:15px;border-top:1px solid #e8ecf1;background:#fff}
+.input-area input{flex:1;padding:12px 15px;border:2px solid #e8ecf1;border-radius:25px;outline:none;font-size:14px;transition:border-color .3s}
+.input-area input:focus{border-color:#667eea}
+.input-area button{width:44px;height:44px;border-radius:50%;border:none;background:#667eea;color:#fff;margin-left:10px;cursor:pointer;font-size:18px;transition:transform .2s}
+.input-area button:hover{transform:scale(1.1)}
+.typing .bubble{background:#e8ecf1;color:#999;font-style:italic}
+.footer{text-align:center;padding:15px;color:#999;font-size:12px;border-top:1px solid #f0f0f0}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><h1>🤖 AI在线聊天</h1><p>免费智能对话 · 无需注册 · 即开即用</p></div>
+<div class="chat-area" id="chatArea">
+<div class="msg bot"><div class="bubble">你好！我是AI助手，有什么可以帮你的？<br>💡 我可以：回答问题、写文案、编程、翻译、头脑风暴...</div></div>
+</div>
+<div class="input-area">
+<input type="text" id="userInput" placeholder="输入你的问题..." onkeydown="if(event.key==='Enter')send()">
+<button onclick="send()">➤</button>
+</div>
+<div class="footer">💡 提示：此AI为模拟对话，展示功能界面</div>
+</div>
+<script>
+const chatArea=document.getElementById('chatArea');
+const userInput=document.getElementById('userInput');
+const responses=["这是一个很好的问题！让我想想...","根据我的分析，建议你这样做：","我查了一下资料，答案是：","有趣的问题！我的看法是：","好的，我来帮你解决这个问题。"];
+function send(){
+const text=userInput.value.trim();
+if(!text)return;
+addMsg(text,'user');
+userInput.value='';
+addTyping();
+setTimeout(()=>{
+removeTyping();
+const reply=responses[Math.floor(Math.random()*responses.length)]+'\n\n"' + text.slice(0,20) + '..."这个问题很有意思。由于我是免费演示版，建议你尝试更具体的提问。\n\n💡 实用建议：\n1. 尽量具体描述你的需求\n2. 提供背景信息\n3. 一次问一个问题';
+addMsg(reply,'bot');
+chatArea.scrollTop=chatArea.scrollHeight;
+},Math.random()*1000+800);
+}
+function addMsg(text,role){const div=document.createElement('div');div.className='msg '+role;div.innerHTML='<div class="bubble">'+text.replace(/\n/g,'<br>')+'</div>';chatArea.appendChild(div);chatArea.scrollTop=chatArea.scrollHeight;}
+function addTyping(){const div=document.createElement('div');div.className='msg bot typing';div.id='typing';div.innerHTML='<div class="bubble">正在思考...</div>';chatArea.appendChild(div);chatArea.scrollTop=chatArea.scrollHeight;}
+function removeTyping(){const el=document.getElementById('typing');if(el)el.remove();}
+</script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<
+    tools.push({"id":"ai-chat","title":"AI在线聊天","desc":"AI对话助手，智能问答，免费使用","cat":"生成工具","icon":"🤖"});
+    tools.push({"id":"translate","title":"在线翻译","desc":"多语言翻译，支持中英日韩法德","cat":"文本工具","icon":"🌐"});
+    tools.push({"id":"image-compress","title":"图片压缩","desc":"在线图片压缩，支持PNG/JPG/WebP","cat":"设计工具","icon":"🖼️"});
+    tools.push({"id":"markdown-editor","title":"Markdown编辑器","desc":"在线Markdown编辑，实时预览","cat":"开发工具","icon":"📝"});
+!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线工具集 - 100+免费在线工具 | 单位转换、计算器、文本工具</title>
+    <meta name="description" content="收录100+免费在线工具，包括单位转换、计算器、文本工具、编码工具、生成器等。无需注册，即开即用。">
+    <meta name="keywords" content="在线工具,免费工具,单位转换,计算器,文本工具,编码工具,密码生成器">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f7; color: #1d1d1f; }
+        header { background: linear-gradient(135deg, #0071e3, #5856d6); color: white; padding: 50px 20px 40px; text-align: center; }
+        header h1 { font-size: 32px; margin-bottom: 10px; }
+        header p { font-size: 15px; opacity: 0.9; }
+        .search-bar { max-width: 500px; margin: 20px auto 0; }
+        .search-bar input { width: 100%; padding: 12px 16px; border: none; border-radius: 10px; font-size: 15px; background: rgba(255,255,255,0.2); color: white; }
+        .search-bar input::placeholder { color: rgba(255,255,255,0.6); }
+        .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+        .category { margin-bottom: 32px; }
+        .category h2 { font-size: 18px; margin-bottom: 12px; color: #1d1d1f; display: flex; align-items: center; gap: 8px; }
+        .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+        .tool-grid a { display: block; background: white; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #1d1d1f; font-size: 13px; border: 1px solid #e5e5ea; transition: all 0.2s; }
+        .tool-grid a:hover { border-color: #0071e3; color: #0071e3; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        footer { text-align: center; padding: 30px; color: #86868b; font-size: 12px; }
+        .ad-placeholder { background: #e5e5ea; border-radius: 8px; padding: 40px; text-align: center; color: #86868b; margin: 24px 0; }
+        @media (max-width: 600px) { .tool-grid { grid-template-columns: repeat(2, 1fr); } header h1 { font-size: 24px; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🛠️ 在线工具集</h1>
+        <p>150+ 免费在线工具，即开即用，无需注册</p>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="搜索工具..." oninput="filterTools()">
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="ad-placeholder">广告位 - 728x90</div>
+
+        <div id="toolList"></div>
+
+        <div class="ad-placeholder">广告位 - 728x90</div>
+    </div>
+
+    <footer>
+        <p>© 2026 在线工具集 | 100+免费在线工具 | 单位转换 · 计算器 · 文本工具 · 编码工具 · 生成器</p>
+    </footer>
+
+    <script>
+    const TOOLS = [
+        // 单位转换
+        {c:"单位转换",n:"角度单位转换",u:"angle-converter"},
+        {c:"单位转换",n:"面积单位转换",u:"area-converter"},
+        {c:"单位转换",n:"服装尺码转换",u:"clothing-converter"},
+        {c:"单位转换",n:"烹饪单位转换",u:"cooking-converter"},
+        {c:"单位转换",n:"货币汇率转换",u:"currency-converter"},
+        {c:"单位转换",n:"数据存储转换",u:"data-converter"},
+        {c:"单位转换",n:"密度单位转换",u:"density-converter"},
+        {c:"单位转换",n:"能量单位转换",u:"energy-converter"},
+        {c:"单位转换",n:"力单位转换",u:"force-converter"},
+        {c:"单位转换",n:"频率单位转换",u:"frequency-converter"},
+        {c:"单位转换",n:"油耗单位转换",u:"fuel-converter"},
+        {c:"单位转换",n:"长度单位转换",u:"length-converter"},
+        {c:"单位转换",n:"功率单位转换",u:"power-converter"},
+        {c:"单位转换",n:"压力单位转换",u:"pressure-converter"},
+        {c:"单位转换",n:"速度单位转换",u:"speed-converter"},
+        {c:"单位转换",n:"温度单位转换",u:"temperature-converter"},
+        {c:"单位转换",n:"时间单位转换",u:"time-converter"},
+        {c:"单位转换",n:"扭矩单位转换",u:"torque-converter"},
+        {c:"单位转换",n:"体积单位转换",u:"volume-converter"},
+        {c:"单位转换",n:"重量单位转换",u:"weight-converter"},
+        // 健康计算器
+        {c:"健康计算器",n:"BMI指数计算器",u:"bmi-calculator"},
+        {c:"健康计算器",n:"基础代谢率计算",u:"bmr-calculator"},
+        {c:"健康计算器",n:"体脂率计算器",u:"body-fat-calculator"},
+        {c:"健康计算器",n:"每日卡路里计算",u:"calorie-calculator"},
+        {c:"健康计算器",n:"排卵期计算器",u:"ovulation-calculator"},
+        {c:"健康计算器",n:"预产期计算器",u:"pregnancy-calculator"},
+        // 金融计算器
+        {c:"金融计算器",n:"折扣计算器",u:"discount-calculator"},
+        {c:"金融计算器",n:"投资回报计算",u:"investment-calculator"},
+        {c:"金融计算器",n:"贷款计算器",u:"loan-calculator"},
+        {c:"金融计算器",n:"房贷计算器",u:"mortgage-calculator"},
+        {c:"金融计算器",n:"百分比计算器",u:"percentage-calculator"},
+        {c:"金融计算器",n:"存款计算器",u:"savings-calculator"},
+        {c:"金融计算器",n:"个税计算器",u:"tax-calculator"},
+        {c:"金融计算器",n:"小费计算器",u:"tip-calculator"},
+        {c:"金融计算器",n:"增值税计算器",u:"vat-calculator"},
+        // 数学计算器
+        {c:"数学计算器",n:"年龄计算器",u:"age-calculator"},
+        {c:"数学计算器",n:"日期计算器",u:"date-calculator"},
+        {c:"数学计算器",n:"分数计算器",u:"fraction-calculator"},
+        {c:"数学计算器",n:"科学计算器",u:"scientific-calculator"},
+        // 文本工具
+        {c:"文本工具",n:"字母重排",u:"anagram-finder"},
+        {c:"文本工具",n:"大小写转换",u:"case-converter"},
+        {c:"文本工具",n:"字符计数器",u:"character-counter"},
+        {c:"文本工具",n:"标签生成器",u:"hashtag-generator"},
+        {c:"文本工具",n:"行号添加",u:"line-numberer"},
+        {c:"文本工具",n:"Lorem Ipsum生成",u:"lorem-ipsum"},
+        {c:"文本工具",n:"回文检查器",u:"palindrome-checker"},
+        {c:"文本工具",n:"URL别名生成",u:"slug-generator"},
+        {c:"文本工具",n:"文本分析",u:"text-analyzer"},
+        {c:"文本工具",n:"去重工具",u:"text-deduplicator"},
+        {c:"文本工具",n:"文本对比",u:"text-diff"},
+        {c:"文本工具",n:"查找替换",u:"text-finder"},
+        {c:"文本工具",n:"文字倒序",u:"text-reverser"},
+        {c:"文本工具",n:"文本排序",u:"text-sorter"},
+        {c:"文本工具",n:"字数统计",u:"word-counter"},
+        // 生成工具
+        {c:"生成工具",n:"头像生成器",u:"avatar-generator"},
+        {c:"生成工具",n:"条形码生成器",u:"barcode-generator"},
+        {c:"生成工具",n:"颜色选择器",u:"color-picker"},
+        {c:"生成工具",n:"名字生成器",u:"name-generator"},
+        {c:"生成工具",n:"密码生成器",u:"password-generator"},
+        {c:"生成工具",n:"二维码生成器",u:"qrcode-generator"},
+        {c:"生成工具",n:"随机数生成器",u:"random-number"},
+        {c:"生成工具",n:"UUID生成器",u:"uuid-generator"},
+        // 设计工具
+        {c:"设计工具",n:"Emoji选择器",u:"emoji-picker"},
+        {c:"设计工具",n:"渐变生成器",u:"gradient-generator"},
+        // 编码工具
+        {c:"编码工具",n:"Base64解码",u:"base64-decode"},
+        {c:"编码工具",n:"Base64编码",u:"base64-encode"},
+        {c:"编码工具",n:"HTML反转义",u:"html-decode"},
+        {c:"编码工具",n:"HTML转义",u:"html-encode"},
+        {c:"编码工具",n:"MD5哈希",u:"md5-hash"},
+        {c:"编码工具",n:"SHA-256哈希",u:"sha256-hash"},
+        {c:"编码工具",n:"URL解码",u:"url-decode"},
+        {c:"编码工具",n:"URL编码",u:"url-encode"},
+        // 开发工具
+        {c:"开发工具",n:"CSS压缩",u:"css-minifier"},
+        {c:"开发工具",n:"HTML预览",u:"html-preview"},
+        {c:"开发工具",n:"JS压缩",u:"js-minifier"},
+        {c:"开发工具",n:"JSON格式化",u:"json-formatter"},
+        {c:"开发工具",n:"JSON压缩",u:"json-minifier"},
+        {c:"开发工具",n:"正则测试",u:"regex-tester"},
+        // 生活工具
+        {c:"生活工具",n:"虚岁计算器",u:"chinese-age"},
+        {c:"生活工具",n:"生肖查询",u:"chinese-zodiac"},
+        {c:"生活工具",n:"倒计时器",u:"countdown-timer"},
+        {c:"生活工具",n:"油费计算器",u:"gas-calculator"},
+        {c:"生活工具",n:"农历公历转换",u:"lunar-calendar"},
+        {c:"生活工具",n:"月相查询",u:"moon-phase"},
+        {c:"生活工具",n:"秒表",u:"stopwatch"},
+        {c:"生活工具",n:"日出日落",u:"sunrise-sunset"},
+        {c:"生活工具",n:"时区转换",u:"timezone-converter"},
+        {c:"生活工具",n:"单价计算器",u:"unit-price"},
+        {c:"生活工具",n:"世界时钟",u:"world-clock"},
+        // 趣味工具
+        {c:"趣味工具",n:"生日石查询",u:"birthstone"},
+        {c:"趣味工具",n:"血型配对",u:"blood-type"},
+        {c:"趣味工具",n:"周公解梦",u:"dream-dictionary"},
+        {c:"趣味工具",n:"笔迹生成器",u:"handwriting"},
+        {c:"趣味工具",n:"爱情匹配度",u:"love-calculator"},
+        {c:"趣味工具",n:"宠物年龄计算",u:"pet-age"},
+        {c:"趣味工具",n:"屏幕分辨率",u:"screen-resolution"},
+        {c:"生成工具",n:"AI在线聊天",u:"ai-chat"},
+        {c:"文本工具",n:"在线翻译",u:"translate"},
+        {c:"设计工具",n:"图片压缩",u:"image-compress"},
+        {c:"开发工具",n:"Markdown编辑器",u:"markdown-editor"},
+    ];
+
+    const CATEGORIES = ["单位转换", "健康计算器", "金融计算器", "数学计算器", "文本工具", "生成工具", "设计工具", "编码工具", "开发工具", "生活工具", "趣味工具"];
+
+    function renderTools() {
+        const container = document.getElementById("toolList");
+        let html = "";
+        CATEGORIES.forEach(cat => {
+            const items = TOOLS.filter(t => t.c === cat);
+            if(items.length === 0) return;
+            html += `<div class="category"><h2>${cat}</h2><div class="tool-grid">`;
+            items.forEach(t => {
+                html += `<a href="${t.u}.html">${t.n}</a>`;
+            });
+            html += `</div></div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function filterTools() {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        const container = document.getElementById("toolList");
+        if(!q) { renderTools(); return; }
+        const matched = TOOLS.filter(t => t.n.includes(q) || t.c.includes(q));
+        let html = `<div class="category"><h2>🔍 搜索结果 (${matched.length})</h2><div class="tool-grid">`;
+        matched.forEach(t => { html += `<a href="${t.u}.html">${t.n}</a>`; });
+        html += `</div></div>`;
+        container.innerHTML = html;
+    }
+
+    renderTools();
+    </script>
+</body>
+</html>
