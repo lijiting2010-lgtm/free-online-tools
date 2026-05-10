@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>龙渊AI工坊 - 智能服务商城</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+    background: #0f0f23;
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a1a3e 0%, #0f0f23 100%);
+    padding: 40px 20px;
+    text-align: center;
+    border-bottom: 1px solid #2a2a5e;
+  }
+  .header h1 {
+    font-size: 2.2em;
+    background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  .header p { color: #8888aa; font-size: 1.1em; }
+  .header .eth-badge {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 8px 20px;
+    background: rgba(123, 47, 247, 0.15);
+    border: 1px solid #7b2ff7;
+    border-radius: 25px;
+    font-size: 0.85em;
+    color: #a78bfa;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .header .eth-badge:hover {
+    background: rgba(123, 47, 247, 0.25);
+    transform: scale(1.02);
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+  }
+  .product-card {
+    background: linear-gradient(145deg, #1a1a3e, #16162f);
+    border: 1px solid #2a2a5e;
+    border-radius: 16px;
+    padding: 30px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .product-card:hover {
+    transform: translateY(-5px);
+    border-color: #7b2ff7;
+    box-shadow: 0 10px 40px rgba(123, 47, 247, 0.15);
+  }
+  .product-card .badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+  }
+  .badge.popular { background: #7b2ff7; color: white; }
+  .badge.new { background: #00d4ff; color: #0f0f23; }
+  .product-card .icon { font-size: 2.5em; margin-bottom: 15px; }
+  .product-card h3 { font-size: 1.3em; margin-bottom: 10px; color: #fff; }
+  .product-card .desc { color: #8888aa; font-size: 0.9em; line-height: 1.6; margin-bottom: 15px; }
+  .product-card .features { list-style: none; margin-bottom: 20px; }
+  .product-card .features li {
+    padding: 5px 0;
+    font-size: 0.85em;
+    color: #aaaacc;
+  }
+  .product-card .features li::before { content: "✓ "; color: #00d4ff; }
+  .price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 20px;
+    border-top: 1px solid #2a2a5e;
+  }
+  .price-row .price {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #00d4ff;
+  }
+  .price-row .price small {
+    font-size: 0.5em;
+    color: #8888aa;
+    font-weight: 400;
+  }
+  .price-row .eth-price {
+    font-size: 0.85em;
+    color: #a78bfa;
+  }
+  .btn-buy {
+    padding: 10px 25px;
+    background: linear-gradient(135deg, #7b2ff7, #00d4ff);
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9em;
+  }
+  .btn-buy:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(123, 47, 247, 0.4); }
+
+  /* 付款弹窗 */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: #1a1a3e;
+    border: 1px solid #2a2a5e;
+    border-radius: 20px;
+    padding: 35px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal h2 { color: #fff; margin-bottom: 10px; text-align: center; }
+  .modal .subtitle { color: #8888aa; text-align: center; margin-bottom: 25px; font-size: 0.9em; }
+  .payment-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .payment-option {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #2a2a5e;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #16162f;
+    color: #e0e0e0;
+    font-weight: 500;
+  }
+  .payment-option.active {
+    border-color: #7b2ff7;
+    background: rgba(123, 47, 247, 0.15);
+    color: #a78bfa;
+  }
+  .payment-option:hover { border-color: #7b2ff7; }
+  .payment-detail { text-align: center; }
+  .payment-detail .qrcode {
+    width: 200px; height: 200px;
+    margin: 15px auto;
+    background: white;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .payment-detail .qrcode img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+  .payment-detail .address-box {
+    background: #16162f;
+    border: 1px solid #2a2a5e;
+    border-radius: 10px;
+    padding: 12px;
+    margin: 15px 0;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 0.85em;
+    color: #a78bfa;
+    cursor: pointer;
+  }
+  .payment-detail .verify-btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.3s;
+  }
+  .payment-detail .verify-btn:hover { transform: scale(1.05); }
+  .payment-detail .verify-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .verify-result {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 0.9em;
+  }
+  .verify-result.success {
+    background: rgba(0, 200, 83, 0.1);
+    border: 1px solid #00c853;
+    color: #69f0ae;
+  }
+  .verify-result.fail {
+    background: rgba(255, 87, 34, 0.1);
+    border: 1px solid #ff5722;
+    color: #ff8a65;
+  }
+  .verify-result.loading {
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid #00d4ff;
+    color: #40c4ff;
+  }
+  .close-btn {
+    position: absolute;
+    top: 15px; right: 20px;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #8888aa;
+  }
+  .modal-header { position: relative; }
+
+  /* 步骤说明 */
+  .steps {
+    display: flex;
+    justify-content: space-between;
+    margin: 25px 0;
+    position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: #2a2a5e;
+    transform: translateY(-50%);
+  }
+  .step {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .step-num {
+    width: 35px; height: 35px;
+    border-radius: 50%;
+    background: #2a2a5e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-weight: 700;
+    font-size: 0.9em;
+    color: #8888aa;
+    border: 2px solid #2a2a5e;
+  }
+  .step.active .step-num {
+    background: #7b2ff7;
+    color: white;
+    border-color: #7b2ff7;
+  }
+  .step.done .step-num {
+    background: #00c853;
+    color: white;
+    border-color: #00c853;
+  }
+  .step-text { font-size: 0.75em; color: #8888aa; }
+  .step.active .step-text { color: #a78bfa; }
+  .step.done .step-text { color: #69f0ae; }
+
+  /* 页脚 */
+  .footer {
+    text-align: center;
+    padding: 30px;
+    border-top: 1px solid #2a2a5e;
+    color: #6666aa;
+    font-size: 0.85em;
+  }
+  .footer a { color: #7b2ff7; text-decoration: none; }
+
+  /* 回到顶部 */
+  .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #7b2ff7;
+    text-decoration: none;
+    font-size: 0.9em;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.5em; }
+    .products-grid { grid-template-columns: 1fr; }
+    .price-row { flex-direction: column; gap: 15px; }
+    .btn-buy { width: 100%; }
+    .payment-options { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🐉 龙渊AI工坊</h1>
+  <p>AI驱动的智能服务 · 付款后自动交付</p>
+  <div class="eth-badge" onclick="copyAddress()" title="点击复制ETH地址">
+    📋 ETH: 0xC1957c933eaAD66fe44A269dcB0C93C3DFDD38eB
+  </div>
+</div>
+
+<div class="container">
+  <div class="products-grid" id="productsGrid">
+    <!-- 产品卡片由JS动态生成 -->
+  </div>
+
+  <!-- 付款流程说明 -->
+  <div style="background: #1a1a3e; border: 1px solid #2a2a5e; border-radius: 16px; padding: 30px; text-align: center; margin-bottom: 40px;">
+    <h3 style="color: #fff; margin-bottom: 20px;">📋 购买流程</h3>
+    <div class="steps" id="purchaseSteps">
+      <div class="step active">
+        <div class="step-num">1</div>
+        <div class="step-text">选择商品</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">支付ETH</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">验证到账</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">获取商品</div>
+      </div>
+    </div>
+    <p style="color: #8888aa; font-size: 0.9em; margin-top: 15px;">
+      💡 支付后点击"验证付款"，系统自动检测链上交易并解锁下载
+    </p>
+  </div>
+
+  <div style="text-align: center;">
+    <a href="index.html" class="back-link">← 返回免费工具首页</a>
+  </div>
+</div>
+
+<div class="footer">
+  <p>🐉 龙渊AI工坊 · 有问题请联系微信：lijiting824</p>
+  <p style="margin-top: 5px; font-size: 0.8em;">接受 ETH / USDT (ERC-20) 付款 · 区块链自动验证</p>
+</div>
+
+<!-- 付款弹窗 -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalProductName">选择支付方式</h2>
+      <span class="close-btn" onclick="closeModal()">✕</span>
+    </div>
+    <p class="subtitle" id="modalProductPrice"></p>
+
+    <div class="payment-options">
+      <div class="payment-option active" onclick="switchPayment('eth')">
+        <div style="font-size: 1.5em; margin-bottom: 5px;">Ξ</div>
+        <div>ETH / USDT</div>
+        <div style="font-size: 0.75em; color: #6666aa;">自动验证</div>
+      </div>
+      <div class="payment-option" onclick="switchPayment('wechat')">
+        <div style="font-size: 1.5em; margin-bottom: 5px;">💬</div>
+        <div>微信支付</div>
+        <div style="font-size: 0.75em; color: #6666aa;">扫码支付</div>
+      </div>
+    </div>
+
+    <div class="payment-detail" id="ethPayment">
+      <p style="color: #aaaacc; margin-bottom: 10px;">转账到以下地址（ETH / USDT-ERC20）</p>
+      <div class="address-box" onclick="copyAddress()" title="点击复制">
+        0xC1957c933eaAD66fe44A269dcB0C93C3DFDD38eB
+      </div>
+      <p style="color: #6666aa; font-size: 0.8em; margin-bottom: 5px;">点击地址复制 ↑</p>
+      <p id="ethAmount" style="color: #00d4ff; font-weight: 600; margin: 10px 0;"></p>
+      <button class="verify-btn" id="verifyBtn" onclick="verifyPayment()">🔄 验证付款</button>
+      <div class="verify-result" id="verifyResult"></div>
+    </div>
+
+    <div class="payment-detail" id="wechatPayment" style="display:none;">
+      <p style="color: #aaaacc; margin-bottom: 10px;">打开微信扫一扫付款</p>
+      <div class="qrcode">
+        <img src="wechat-pay.jpeg" alt="微信收款码" onerror="this.parentElement.innerHTML='二维码加载失败，请联系微信：lijiting824'">
+      </div>
+      <p style="color: #6666aa; font-size: 0.85em;">付款后截图发微信：lijiting824 · 人工发货</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 商品数据 =====
+const products = [
+  {
+    id: 'resume',
+    icon: '📄',
+    name: 'AI简历优化服务',
+    desc: '专业简历模板 + AI智能优化，让你的简历脱颖而出',
+    features: ['3套精美简历模板（可编辑）', 'AI智能内容优化建议', '中英文双语版本', '一页纸专业排版'],
+    price: 19.9,
+    ethPrice: '0.001',
+    badge: 'popular',
+    badgeText: '🔥 热销'
+  },
+  {
+    id: 'essay',
+    icon: '✍️',
+    name: 'AI论文写作助手',
+    desc: '从选题到完稿，AI全程辅助论文写作',
+    features: ['论文大纲自动生成', '学术化语言润色', '参考文献格式整理', '查重降重建议'],
+    price: 29.9,
+    ethPrice: '0.002',
+    badge: 'new',
+    badgeText: '✨ 新品'
+  },
+  {
+    id: 'study',
+    icon: '📚',
+    name: 'AI学习资料包',
+    desc: '各学科精华资料合集，学习效率翻倍',
+    features: ['数理化重点知识梳理', '英语作文万能模板', '语文古诗词速记手册', '考试技巧总结'],
+    price: 9.9,
+    ethPrice: '0.0005',
+    badge: '',
+    badgeText: ''
+  },
+  {
+    id: 'coding',
+    icon: '💻',
+    name: 'AI编程答疑',
+    desc: '编程作业辅导 + 代码优化 + 项目思路',
+    features: ['Python/C/Java问题解答', '代码调试与优化', '算法思路解析', '项目架构建议'],
+    price: 39.9,
+    ethPrice: '0.0025',
+    badge: '',
+    badgeText: ''
+  },
+  {
+    id: 'translate',
+    icon: '🌐',
+    name: 'AI翻译润色',
+    desc: '中英互译 + 学术/商务润色',
+    features: ['精准中英互译', '学术论文润色', '商务邮件润色', '留学文书润色'],
+    price: 24.9,
+    ethPrice: '0.0015',
+    badge: '',
+    badgeText: ''
+  },
+  {
+    id: 'ppt',
+    icon: '🎨',
+    name: 'AI PPT大纲设计',
+    desc: '输入主题，AI自动生成专业PPT大纲+内容',
+    features: ['PPT结构自动规划', '每页内容要点生成', '演讲备注建议', '设计风格推荐'],
+    price: 14.9,
+    ethPrice: '0.001',
+    badge: '',
+    badgeText: ''
+  }
+];
+
+// ===== 渲染商品 =====
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = products.map(p => `
+    <div class="product-card">
+      ${p.badge ? `<span class="badge ${p.badge}">${p.badgeText}</span>` : ''}
+      <div class="icon">${p.icon}</div>
+      <h3>${p.name}</h3>
+      <div class="desc">${p.desc}</div>
+      <ul class="features">
+        ${p.features.map(f => `<li>${f}</li>`).join('')}
+      </ul>
+      <div class="price-row">
+        <div>
+          <div class="price">¥${p.price} <small>RMB</small></div>
+          <div class="eth-price">Ξ ${p.ethPrice} ETH</div>
+        </div>
+        <button class="btn-buy" onclick="openPayment('${p.id}')">立即购买</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== 打开付款弹窗 =====
+let currentProduct = null;
+const ETH_ADDRESS = '0xC1957c933eaAD66fe44A269dcB0C93C3DFDD38eB';
+
+function openPayment(productId) {
+  currentProduct = products.find(p => p.id === productId);
+  if (!currentProduct) return;
+
+  document.getElementById('modalProductName').textContent = `${currentProduct.icon} ${currentProduct.name}`;
+  document.getElementById('modalProductPrice').textContent = `¥${currentProduct.price} / Ξ${currentProduct.ethPrice} ETH`;
+  document.getElementById('ethAmount').textContent = `请转账 Ξ ${currentProduct.ethPrice} ETH（或等值USDT）到上方地址`;
+  document.getElementById('verifyResult').className = 'verify-result';
+  document.getElementById('verifyResult').textContent = '';
+  document.getElementById('verifyBtn').disabled = false;
+  document.getElementById('verifyBtn').textContent = '🔄 验证付款';
+
+  switchPayment('eth');
+  document.getElementById('paymentModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('paymentModal').classList.remove('active');
+  currentProduct = null;
+}
+
+function switchPayment(type) {
+  document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('active'));
+  if (type === 'eth') {
+    document.querySelectorAll('.payment-option')[0].classList.add('active');
+    document.getElementById('ethPayment').style.display = 'block';
+    document.getElementById('wechatPayment').style.display = 'none';
+  } else {
+    document.querySelectorAll('.payment-option')[1].classList.add('active');
+    document.getElementById('ethPayment').style.display = 'none';
+    document.getElementById('wechatPayment').style.display = 'block';
+  }
+}
+
+function copyAddress() {
+  navigator.clipboard.writeText(ETH_ADDRESS).then(() => {
+    const badge = document.querySelector('.eth-badge');
+    const orig = badge.textContent;
+    badge.textContent = '✅ 已复制！';
+    setTimeout(() => { badge.textContent = orig; }, 2000);
+  }).catch(() => {
+    alert('ETH地址: ' + ETH_ADDRESS);
+  });
+}
+
+// ===== 验证付款 =====
+async function verifyPayment() {
+  if (!currentProduct) return;
+
+  const btn = document.getElementById('verifyBtn');
+  const result = document.getElementById('verifyResult');
+  btn.disabled = true;
+  btn.textContent = '⏳ 查询中...';
+  result.className = 'verify-result loading';
+  result.textContent = '正在查询区块链交易，请稍候...';
+
+  try {
+    // 使用 Ethplorer 免费API查询地址交易
+    const resp = await fetch(`https://api.ethplorer.io/getAddressHistory/${ETH_ADDRESS}?apiKey=freekey&limit=20`);
+    const data = await resp.json();
+
+    if (data && data.operations) {
+      // 查找匹配的交易
+      const targetEthWei = parseFloat(currentProduct.ethPrice);
+      let found = false;
+      let totalReceived = 0;
+      const recentOps = data.operations.filter(op => op.type === 'transfer' || op.type === 'push');
+
+      for (const op of recentOps) {
+        if (op.to && op.to.toLowerCase() === ETH_ADDRESS.toLowerCase()) {
+          const value = op.value || 0;
+          const tokenInfo = op.tokenInfo;
+          if (tokenInfo) {
+            // USDT等代币
+            const decimals = tokenInfo.decimals || 18;
+            const symbol = tokenInfo.symbol || '';
+            const amount = value / Math.pow(10, decimals);
+            totalReceived += amount;
+            if (symbol === 'USDT' && amount >= parseFloat(currentProduct.ethPrice) * 2300) {
+              found = true;
+            }
+          } else {
+            // ETH转账
+            const ethAmount = value / 1e18;
+            totalReceived += ethAmount;
+            if (ethAmount >= targetEthWei * 0.95) { // 95% threshold for gas fees
+              found = true;
+            }
+          }
+        }
+      }
+
+      if (found) {
+        result.className = 'verify-result success';
+        result.innerHTML = `✅ <strong>付款已确认！</strong><br>检测到收款，请添加微信 <strong>lijiting824</strong> 获取商品。`;
+        // 更新步骤
+        document.querySelectorAll('.step')[2].classList.add('done');
+        document.querySelectorAll('.step')[3].classList.add('active');
+      } else {
+        result.className = 'verify-result fail';
+        result.innerHTML = `❌ 未检测到匹配交易<br><small>请确认已转账到正确地址，转账后约1-5分钟上链。</small>`;
+      }
+    } else {
+      result.className = 'verify-result fail';
+      result.innerHTML = `❌ 查询失败，请稍后重试或直接联系微信：lijiting824`;
+    }
+  } catch (err) {
+    result.className = 'verify-result fail';
+    result.innerHTML = `❌ 网络错误，请稍后重试或直接联系微信：lijiting824`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🔄 再次验证';
+}
+
+// ===== 初始化 =====
+renderProducts();
+
+// 点击弹窗外部关闭
+document.getElementById('paymentModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+
+</body>
+</html>

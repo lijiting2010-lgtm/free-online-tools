@@ -17,9 +17,6 @@
         header { background: linear-gradient(135deg, #0071e3, #5856d6); color: white; padding: 50px 20px 40px; text-align: center; }
         header h1 { font-size: 32px; margin-bottom: 10px; }
         header p { font-size: 15px; opacity: 0.9; }
-        .header-actions { margin-top: 18px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .btn-shop { display: inline-block; background: #ff9500; color: white; padding: 10px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.3s; }
-        .btn-shop:hover { background: #ffaa33; transform: scale(1.05); }
         .search-bar { max-width: 500px; margin: 20px auto 0; }
         .search-bar input { width: 100%; padding: 12px 16px; border: none; border-radius: 10px; font-size: 15px; background: rgba(255,255,255,0.2); color: white; }
         .search-bar input::placeholder { color: rgba(255,255,255,0.6); }
@@ -38,9 +35,6 @@
     <header>
         <h1>🛠️ 在线工具集</h1>
         <p>150+ 免费在线工具，即开即用，无需注册</p>
-        <div class="header-actions">
-            <a href="shop.html" class="btn-shop">🛒 龙渊AI工坊 - 付费服务</a>
-        </div>
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="搜索工具..." oninput="filterTools()">
         </div>
