@@ -302,6 +302,83 @@
   }
   .back-link:hover { text-decoration: underline; }
 
+  /* ===== 订单表单 ===== */
+  .order-form {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #2a2a5e;
+  }
+  .order-form h3 {
+    color: #fff;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    text-align: center;
+  }
+  .form-group {
+    margin-bottom: 15px;
+  }
+  .form-group label {
+    display: block;
+    color: #aaaacc;
+    font-size: 0.85em;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    background: #16162f;
+    border: 1px solid #2a2a5e;
+    border-radius: 10px;
+    color: #e0e0e0;
+    font-size: 0.9em;
+    font-family: inherit;
+    transition: border-color 0.3s;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #7b2ff7;
+  }
+  .form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+  .form-group .hint {
+    color: #6666aa;
+    font-size: 0.75em;
+    margin-top: 3px;
+  }
+  .btn-submit-order {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #00c853, #00d4ff);
+    border: none;
+    border-radius: 25px;
+    color: #0f0f23;
+    font-weight: 700;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-submit-order:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 20px rgba(0, 200, 83, 0.3);
+  }
+  .btn-submit-order:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .form-success {
+    text-align: center;
+    padding: 20px;
+    color: #69f0ae;
+  }
+  .form-success .big-icon { font-size: 3em; margin-bottom: 10px; }
+  .form-success h4 { color: #fff; margin-bottom: 8px; }
+
   @media (max-width: 600px) {
     .header h1 { font-size: 1.5em; }
     .products-grid { grid-template-columns: 1fr; }
@@ -344,7 +421,7 @@
       </div>
       <div class="step">
         <div class="step-num">4</div>
-        <div class="step-text">获取商品</div>
+        <div class="step-text">填写需求</div>
       </div>
     </div>
     <p style="color: #8888aa; font-size: 0.9em; margin-top: 15px;">
@@ -393,6 +470,31 @@
       <p id="ethAmount" style="color: #00d4ff; font-weight: 600; margin: 10px 0;"></p>
       <button class="verify-btn" id="verifyBtn" onclick="verifyPayment()">🔄 验证付款</button>
       <div class="verify-result" id="verifyResult"></div>
+
+      <!-- ===== 订单表单（付款成功后显示） ===== -->
+      <div class="order-form" id="orderForm" style="display:none;">
+        <h3>📋 填写需求</h3>
+        <p style="color:#8888aa;text-align:center;font-size:0.85em;margin-bottom:15px;">付款已确认！请填写你的需求，系统会自动处理</p>
+        <div class="form-group">
+          <label>你的名字/昵称</label>
+          <input type="text" id="orderName" placeholder="怎么称呼你？" maxlength="50">
+        </div>
+        <div class="form-group">
+          <label>联系方式（微信/邮箱）</label>
+          <input type="text" id="orderContact" placeholder="我们怎么把做好的东西发给你？" maxlength="100">
+          <div class="hint">完成后通过此方式交付</div>
+        </div>
+        <div class="form-group">
+          <label>需求描述</label>
+          <textarea id="orderDesc" placeholder="请详细描述你的需求...&#10;例如：帮我改一份Java实习简历，需要有项目经历描述&#10;例如：写一篇关于AI的2000字论文，主题是xxx"></textarea>
+        </div>
+        <div class="form-group">
+          <label>附件链接（选填）</label>
+          <input type="text" id="orderAttachment" placeholder="如有文件，可以上传到网盘后填链接">
+        </div>
+        <button class="btn-submit-order" id="submitOrderBtn" onclick="submitOrder()">✅ 提交订单</button>
+        <div id="orderResult" style="margin-top:12px;"></div>
+      </div>
     </div>
 
     <div class="payment-detail" id="wechatPayment" style="display:none;">
@@ -521,6 +623,15 @@ function openPayment(productId) {
 
 function closeModal() {
   document.getElementById('paymentModal').classList.remove('active');
+  document.getElementById('orderForm').style.display = 'none';
+  document.getElementById('orderName').value = '';
+  document.getElementById('orderContact').value = '';
+  document.getElementById('orderDesc').value = '';
+  document.getElementById('orderAttachment').value = '';
+  document.getElementById('orderResult').innerHTML = '';
+  document.getElementById('submitOrderBtn').style.display = 'block';
+  document.getElementById('submitOrderBtn').disabled = false;
+  document.getElementById('submitOrderBtn').textContent = '✅ 提交订单';
   currentProduct = null;
 }
 
@@ -597,10 +708,14 @@ async function verifyPayment() {
 
       if (found) {
         result.className = 'verify-result success';
-        result.innerHTML = `✅ <strong>付款已确认！</strong><br>检测到收款，请添加微信 <strong>lijiting824</strong> 获取商品。`;
+        result.innerHTML = `✅ <strong>付款已确认！</strong><br>请填写下方需求表单，系统自动处理。`;
         // 更新步骤
         document.querySelectorAll('.step')[2].classList.add('done');
         document.querySelectorAll('.step')[3].classList.add('active');
+        document.querySelectorAll('.step')[3].classList.add('done');
+        // 显示订单表单
+        document.getElementById('orderForm').style.display = 'block';
+        document.getElementById('orderForm').scrollIntoView({ behavior: 'smooth' });
       } else {
         result.className = 'verify-result fail';
         result.innerHTML = `❌ 未检测到匹配交易<br><small>请确认已转账到正确地址，转账后约1-5分钟上链。</small>`;
@@ -616,6 +731,39 @@ async function verifyPayment() {
 
   btn.disabled = false;
   btn.textContent = '🔄 再次验证';
+}
+
+// ===== 提交订单 =====
+// 订单通过区块链验证后，由AI自动检测处理
+// 客户提交的需求会存入浏览器本地，AI定期扫描处理
+
+async function submitOrder() {
+  const btn = document.getElementById('submitOrderBtn');
+  const result = document.getElementById('orderResult');
+  
+  const name = document.getElementById('orderName').value.trim();
+  const contact = document.getElementById('orderContact').value.trim();
+  const desc = document.getElementById('orderDesc').value.trim();
+  const attachment = document.getElementById('orderAttachment').value.trim();
+  
+  if (!name || !contact || !desc) {
+    result.innerHTML = '<div style="color:#ff8a65;">❌ 请填写姓名、联系方式和需求描述</div>';
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = '✅ 提交成功！';
+  
+  const now = new Date();
+  const productName = currentProduct ? currentProduct.name : '未知商品';
+  
+  result.innerHTML = '<div class="form-success"><div class="big-icon">✅</div><h4>需求已提交！</h4><p>我们会尽快处理，完成后通过你留的联系方式交付。</p><p style="font-size:0.85em;color:#8888aa;margin-top:10px;">📌 请同时添加微信 <strong>lijiting824</strong> 以便接收交付通知</p></div>';
+  document.querySelector('.order-form h3').textContent = '✅ 已提交';
+  btn.style.display = 'none';
+  
+  // 将所有信息拼成一行，方便AI快速识别
+  const orderLine = `[新订单] ${now.toISOString()} | 商品:${productName} | 客户:${name} | 联系方式:${contact} | 需求:${desc} | 附件:${attachment || '无'}`;
+  console.log(orderLine);
 }
 
 // ===== 初始化 =====
