@@ -234,7 +234,7 @@
   }
   .modal-header { position: relative; }
 
-  /* 步骤说明 */
+  /* Steps */
   .steps {
     display: flex;
     justify-content: space-between;
@@ -283,7 +283,7 @@
   .step.active .step-text { color: #a78bfa; }
   .step.done .step-text { color: #69f0ae; }
 
-  /* 页脚 */
+  /* Footer */
   .footer {
     text-align: center;
     padding: 30px;
@@ -293,7 +293,7 @@
   }
   .footer a { color: #7b2ff7; text-decoration: none; }
 
-  /* 回到顶部 */
+  /* Back to top */
   .back-link {
     display: inline-block;
     margin-top: 20px;
@@ -511,7 +511,7 @@
 <script>
 
 
-// ===== 商品数据 =====
+// ===== Product Data =====
 const products = [
   {
     id: 'resume',
@@ -581,7 +581,7 @@ const products = [
   }
 ];
 
-// ===== 渲染商品 =====
+// ===== Render Products =====
 function renderProducts() {
   const grid = document.getElementById('productsGrid');
   grid.innerHTML = products.map(p => `
@@ -604,7 +604,7 @@ function renderProducts() {
   `).join('');
 }
 
-// ===== 打开付款弹窗 =====
+// ===== Open Payment Modal =====
 let currentProduct = null;
 const ETH_ADDRESS = '0xC1957c933eaAD66fe44A269dcB0C93C3DFDD38eB';
 
@@ -690,7 +690,7 @@ async function verifyPayment() {
           const value = op.value || 0;
           const tokenInfo = op.tokenInfo;
           if (tokenInfo) {
-            // USDT等代币
+            // USDT tokens
             const decimals = tokenInfo.decimals || 18;
             const symbol = tokenInfo.symbol || '';
             const amount = value / Math.pow(10, decimals);
@@ -699,7 +699,7 @@ async function verifyPayment() {
               found = true;
             }
           } else {
-            // ETH转账
+            // ETH transfer
             const ethAmount = value / 1e18;
             totalReceived += ethAmount;
             if (ethAmount >= targetEthWei * 0.95) { // 95% threshold for gas fees
@@ -712,7 +712,7 @@ async function verifyPayment() {
       if (found) {
         result.className = 'verify-result success';
         result.innerHTML = '✅ <strong>Payment Confirmed!</strong><br>Fill in the form below and we will process your order.';
-        // 更新步骤
+        // Update steps
         document.querySelectorAll('.step')[2].classList.add('done');
         document.querySelectorAll('.step')[3].classList.add('active');
         document.querySelectorAll('.step')[3].classList.add('done');
@@ -768,7 +768,7 @@ async function submitOrder() {
   console.log(orderLine);
 }
 
-// ===== 初始化 =====
+// ===== Init =====
 renderProducts();
 
 // Close modal when clicking outside
